@@ -1,0 +1,5 @@
+{
+    "board": "arduino:avr:uno",
+    "programmer": "AVRISP mkII",
+    "sketch": "Robot.ino"
+}
