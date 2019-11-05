@@ -2,7 +2,7 @@
 
 byte distance[4];
 byte ligne[4];
-enum adv_is 
+enum adv_ise 
 {
     front,
     front_left,
@@ -11,23 +11,30 @@ enum adv_is
     left,
     back
 };
-enum state 
+adv_ise adv_is;
+enum statee 
 {
 	READY;
     START;
     STOP;
 };
+statee state;
 //define de tous les pins
 //pin de distance
 static byte pintrig[4]={1,2,3,4},pinecho[4]={1,2,3,4},pinligne[4]={1,2,3,4};
 #define PIN_IR
 //========================================
 #define PIN_BATT
+#define PIN_A1 //gauche
+#define PIN_A2
+#define PIN_B1 //droite
+#define PIN_B2
+
 static float ratioBit=1023/5;
-static float ratio=15/25;
+static float ratio=10/25;
 //========================================
 unsigned long t0=millis(),t1batt,t1line;
-bool lineCrossed=false;
+#define limiteLine 500 //treshold for a line to be detected
 //========================================
 struct led
 {
@@ -42,6 +49,7 @@ void setup()
 
 void loop()
 {
+	bool problem=false;
 	t1=millis();
 	//depart ou non
     state=getIR();
@@ -50,8 +58,11 @@ void loop()
 	{
 	state=testBatt();
 	if (verifyInfo==-1)
-		return;
+		problem=true;
 	}
+
+	if (!problem && state==START)
+	{
 	//little brain
 	/*gewstion line*/
 	if (gestionLine()==-1)
@@ -62,6 +73,12 @@ void loop()
 	}
 	/*search ennemy*/
 	adv_is=gestionPosAdv();
+	// use adv_is to know where to go
+	attack();
+
+
+
+	}
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
@@ -121,14 +138,14 @@ byte testBatt()
 	{
 		t1batt=millis();
 		low=true
-	ledBatt(/////////) //a completer pour allumé
+	ledBatt_Action(255);
 	if (!low)
 		t0=millis();
 	if (low==true && t1batt-t0>100)
 		return STOP;
 	}
 	if (val<7)
-	ledBatt(/////////) //a completer pour clignoter
+	ledBatt_Action(100);
 return START;
 }
 
@@ -140,22 +157,23 @@ int verifyInfo()
 //===========
 byte gestionLine()
 {
-	if (line[0]==HIGH)//back left
+	bool lineCrossed=false;
+	if (analogRead(line[0])>limiteLine)//back left
 	{
 		lineCrossed=true
 		/////////moteur vers avant droite
 	}
-	if (line[1]==HIGH)//front left
+	if (analogRead(line[1])>limiteLine)//front left
 	{
 		lineCrossed=true
 		/////////moteur vers arriere droite
 	}
-	if (line[2]==HIGH)//front right
+	if (analogRead(line[2])>limiteLine)//front right
 	{
 		lineCrossed=true
 		/////////moteur vers arriere gauche
 	}
-	if (line[3]==HIGH)//back right
+	if (analogRead(line[3])>limiteLine)//back right
 	{
 		lineCrossed=true
 		/////////moteur vers avant gauche
@@ -170,17 +188,113 @@ byte gestionLine()
 byte gestionPosAdv()
 {
 	byte i=0;
-	for(i=0;i<4;i++)
+	for(i=0;i<5;i++)
 	{
-		if (distance[i]<80)// en cours
+		if (i<4)
+		{
+		if (distance[i]<80)
 		return
+		}
+
 	}
 	if (i==0)
 		return left;
 	if (i==3)
 		return right;
-	if (i==
+	if (i==1)
+	{
+		if (distance[2]<80)
+		return front;
+		else return front_left;
+	}
+
+	if (i==2)
+	{
+		if(distance[3]<80)
+		return front;
+		else return front_right;
+	}
+	if (i==5)
+	return back
+}
+
+void attack()
+{
+	static byte last
+	switch (adv_is)
+	{
+	case left:
+		motor_left(1,1);
+		motor_right(1,0);
+		break;
+
+	case front_left:
+		motor_left(0,0);
+		motor_right(1,0);
+		break;
+	case front:
+		motor_left(1,0);
+		motor_right(1,0);
+		break;
+	case front_right:
+		motor_left(1,0);
+		motor_right(0,0);
+		break;
+	case right:
+		motor_left(1,0);
+		motor_right(1,1);
+		break;
+
+	case back:
+	if (last==right)
+	{
+		motor_left(1,0);
+		motor_right(0,1);
+	}
+	if (last==left)
+	{
+		motor_left(0,1);
+		motor_right(1,0);
+	}
+		break;
+	if (last!=back)
+	last=adv_is;
+	default:
+		break;
+	}
 }
 /*
 action
 */
+void ledBatt_Action(byte ratio)
+{
+	analogWrite(PIN_LEDBATT,ratio);
+}
+
+void ledEtat_Action()
+{
+	analogWrite(PIN_LEDG,ledEtat.green);
+	analogWrite(PIN_LEDB,ledEtat.blue);
+}
+
+void motor_left(byte in1,byte in2)
+{
+	if (in1==1)
+	digitalWrite(PIN_A1,HIGH);
+	else digitalWrite(PIN_A1,LOW); 
+	if (in2==1)
+	digitalWrite(PIN_A2,HIGH);
+	else digitalWrite(PIN_A2,LOW); 
+
+}
+
+void motor_right(byte in1,byte in2)
+{
+	if (in1==1)
+	digitalWrite(PIN_B1,HIGH);
+	else digitalWrite(PIN_B1,LOW); 
+	if (in2==1)
+	digitalWrite(PIN_B2,HIGH);
+	else digitalWrite(PIN_B2,LOW); 
+
+}
