@@ -57,7 +57,7 @@ void loop()
 	if (state==START)
 	{
 	state=testBatt();
-	if (verifyInfo==-1)
+	if (verifyInfo==-1)// verify if info are good 
 		problem=true;
 	}
 
@@ -67,7 +67,7 @@ void loop()
 	/*gewstion line*/
 	if (gestionLine()==-1)
 	{
-		while(t1line-t0<200)
+		while(t1line-t0<200)//wait to escape a line
 		{}
 	lineCrossed=false;
 	}
@@ -75,8 +75,6 @@ void loop()
 	adv_is=gestionPosAdv();
 	// use adv_is to know where to go
 	attack();
-
-
 
 	}
 }
@@ -107,10 +105,8 @@ void getLine()
 {
     for(byte i=0;i<4;i++)
     {
-    if(digitalRead(pinligne[i]))
-    line[i]=1;
-    else 
-    ligne[i]=0;
+	static int dummy=analogRead(pinligne[i]);
+    line[i]=analogRead(pinligne[i]);
     }
 }
 
@@ -140,7 +136,10 @@ byte testBatt()
 		low=true
 	ledBatt_Action(255);
 	if (!low)
+	{
 		t0=millis();
+		ledBatt_Action(0);
+	}
 	if (low==true && t1batt-t0>100)
 		return STOP;
 	}
@@ -158,25 +157,33 @@ int verifyInfo()
 byte gestionLine()
 {
 	bool lineCrossed=false;
-	if (analogRead(line[0])>limiteLine)//back left
+	if (line[0]>limiteLine)//back left
 	{
 		lineCrossed=true
 		/////////moteur vers avant droite
+		motor_left(1,0);
+		motor_right(0,0);
 	}
-	if (analogRead(line[1])>limiteLine)//front left
+	if (line[1]>limiteLine)//front left
 	{
 		lineCrossed=true
 		/////////moteur vers arriere droite
+		motor_left(0,1);
+		motor_right(0,0);
 	}
-	if (analogRead(line[2])>limiteLine)//front right
+	if (line[2]>limiteLine)//front right
 	{
 		lineCrossed=true
 		/////////moteur vers arriere gauche
+		motor_left(0,0);
+		motor_right(0,1);
 	}
-	if (analogRead(line[3])>limiteLine)//back right
+	if (line[3]>limiteLine)//back right
 	{
 		lineCrossed=true
 		/////////moteur vers avant gauche
+		motor_left(0,0);
+		motor_right(1,0);
 	}
 	if (lineCrossed)
 		return -1
