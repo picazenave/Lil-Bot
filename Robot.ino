@@ -29,7 +29,9 @@ static byte pintrig[4]={1,2,3,4},pinecho[4]={1,2,3,4},pinligne[4]={1,2,3,4};
 #define PIN_A2
 #define PIN_B1 //droite
 #define PIN_B2
-
+#define PIN_LEDB
+#define PIN_LEDG
+#define PIN_LEDBATT
 static float ratioBit=1023/5;
 static float ratio=10/25;
 //========================================
@@ -60,7 +62,8 @@ void loop()
 	if (verifyInfo==-1)// verify if info are good 
 		problem=true;
 	}
-
+	ledEtat.blue=0;
+	ledEtat.green=0;
 	if (!problem && state==START)
 	{
 	//little brain
@@ -68,15 +71,20 @@ void loop()
 	if (gestionLine()==-1)
 	{
 		while(t1line-t0<200)//wait to escape a line
-		{}
+		{
+			ledEtat.blue=255;
+		}
+	ledEtat.blue=0;
 	lineCrossed=false;
 	}
 	/*search ennemy*/
+
 	adv_is=gestionPosAdv();
 	// use adv_is to know where to go
 	attack();
 
 	}
+	ledEtat_Action();
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
@@ -127,10 +135,10 @@ processing
 bool low=false;
 byte testBatt()
 {
-	float val=getBatteryVoltage();
-	val=val/ratioBit;
+	float val=getBatteryVoltage();//get raw value
+	val=val/ratioBit;//do calc to get Volt
 	val=val/ratio;
-	if (val<6.7)
+	if (val<6.7)//if low start timing
 	{
 		t1batt=millis();
 		low=true
@@ -140,17 +148,17 @@ byte testBatt()
 		t0=millis();
 		ledBatt_Action(0);
 	}
-	if (low==true && t1batt-t0>100)
+	if (low==true && t1batt-t0>100)//if low for too long STOP robot
 		return STOP;
 	}
-	if (val<7)
+	if (val<7)//led is mid brightness to say im low
 	ledBatt_Action(100);
 return START;
 }
 
 int verifyInfo()
 {
-		if(distance[0]<10 && distance[3]<10)
+		if(distance[0]<10 && distance[3]<10)//verify that both captor are not activated at the same time
 			return -1;
 }
 //===========
@@ -227,6 +235,7 @@ byte gestionPosAdv()
 
 void attack()
 {
+	ledEtat.green=255;
 	static byte last
 	switch (adv_is)
 	{
