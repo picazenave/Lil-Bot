@@ -298,7 +298,7 @@ action
 */
 
 //wite pwm ratio on the battery led
-void ledBatt_batt(byte ratio)
+void ledBatt_Action(byte ratio)
 {
 	analogWrite(PIN_LEDBATT, ratio);
 }
