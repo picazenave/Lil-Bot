@@ -92,7 +92,7 @@ void loop()
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
-acquire
+	acquire
 */
 //puts distance from ultrasonic sensor in distance[]
 void getDistance()
@@ -136,8 +136,8 @@ int getBatteryVoltage()
 }
 
 /*
-processing
-*/
+	processing
+	*/
 
 //convert adc value in Volt and activate ledBatt
 //can stop the robot if battery is too low
@@ -212,7 +212,7 @@ byte gestionPosAdv()
 
 	if (verifyInfo() == -1) //verify info from ultrasonic sensor
 	{
-		
+
 		for (byte i = 0; i < 5; i++)
 		{
 			if (i < 4)
@@ -249,7 +249,7 @@ byte gestionPosAdv()
 void attack()
 {
 	ledEtat.green = 255;
-	static byte last 
+	static byte last
 	switch (adv_is)
 	{
 	case left:
@@ -294,8 +294,8 @@ void attack()
 		last = adv_is;
 }
 /*
-action
-*/
+	action
+	*/
 
 //wite pwm ratio on the battery led
 void ledBatt_Action(byte ratio)
