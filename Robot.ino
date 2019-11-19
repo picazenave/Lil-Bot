@@ -209,7 +209,7 @@ byte gestionLine()
 		return -1 else return 0;
 }
 
-//use value from distance[] to know where the ennemy robot is
+//use value from distance[] to know where the enemy robot is
 byte gestionPosAdv()
 {
 	byte i = 0;
@@ -244,7 +244,7 @@ byte gestionPosAdv()
 		return back
 }
 
-//use gestionPosAdv to move in the ennemy direction
+//use gestionPosAdv to move in the enemy direction
 void attack()
 {
 	ledEtat.green = 255;
