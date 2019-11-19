@@ -60,7 +60,6 @@ void setup() //nothing to do for now in setup
 
 void loop()
 {
-	bool problem = false;
 	t1 = millis();
 	//wait for a command from IR
 	state = getIR();
@@ -68,12 +67,10 @@ void loop()
 	if (state == START)
 	{
 		state = testBatt();
-		if (verifyInfo == -1) //verify info from ultrasonic sensors
-			problem = true;
 	}
 	ledEtat.blue = 0;
 	ledEtat.green = 0;
-	if (!problem && state == START) //if battery and info are good then go
+	if (state == START) //if battery and info are good then go
 	{
 		//little brain
 		/*gewstion line*/
@@ -212,43 +209,48 @@ byte gestionLine()
 //use value from distance[] to know where the enemy robot is
 byte gestionPosAdv()
 {
-	byte i = 0;
-	for (i = 0; i < 5; i++)
-	{
-		if (i < 4)
-		{
-			if (distance[i] < 80)
-				return
-		}
-	}
-	if (i == 0)
-		return left;
-	if (i == 3)
-		return right;
-	if (i == 1)
-	{
-		if (distance[2] < 80)
-			return front;
-		else
-			return front_left;
-	}
 
-	if (i == 2)
+	if (verifyInfo() == -1) //verify info from ultrasonic sensor
 	{
-		if (distance[3] < 80)
-			return front;
-		else
-			return front_right;
+		
+		for (byte i = 0; i < 5; i++)
+		{
+			if (i < 4)
+			{
+				if (distance[i] < 80)
+					return
+			}
+		}
+		if (i == 0)
+			return left;
+		if (i == 3)
+			return right;
+		if (i == 1)
+		{
+			if (distance[2] < 80)
+				return front;
+			else
+				return front_left;
+		}
+
+		if (i == 2)
+		{
+			if (distance[3] < 80)
+				return front;
+			else
+				return front_right;
+		}
+		if (i == 5)
+			return back
 	}
-	if (i == 5)
-		return back
 }
 
 //use gestionPosAdv to move in the enemy direction
 void attack()
 {
 	ledEtat.green = 255;
-	static byte last switch (adv_is)
+	static byte last 
+	switch (adv_is)
 	{
 	case left:
 		motor_left(1, 1);
@@ -296,7 +298,7 @@ action
 */
 
 //wite pwm ratio on the battery led
-void ledBatt_Action(byte ratio)
+void ledBatt_batt(byte ratio)
 {
 	analogWrite(PIN_LEDBATT, ratio);
 }
