@@ -1,8 +1,10 @@
+#include <Arduino.h> 
+#include "function.h"
 //========led struc to get cleaner code
 struct led
 {
-	byte green;
-	byte blue;
+	uint8_t green;
+	uint8_t blue;
 };
 led ledEtat; //create a led object
 //========= enum all adv_is values
@@ -19,36 +21,36 @@ adv_ise adv_is;
 //======== enum all state values
 enum statee
 {
-	READY;
-	START;
-	STOP;
+	READY,
+	START,
+	STOP
 };
 statee state;
 //define for all pins
 //pin de distance
 //========================================
-static byte pintrig[4] = {1, 2, 3, 4}, pinecho[4] = {1, 2, 3, 4}, pinligne[4] = {1, 2, 3, 4};
-#define PIN_IR   //pin for ir sensor
-#define PIN_BATT //pin for battery readings
+static uint8_t pintrig[4] = {0, A5, 12, 8}, pinecho[4] = {1, 2, 13, 5}, pinligne[4] = {A1, A7, A2, A0};
+#define PIN_IR A3  //pin for ir sensor
+#define PIN_BATT A6//pin for battery readings
 //======= motors pin
-#define PIN_AM1 //left
-#define PIN_AM2
-#define PIN_BM1 //right
-#define PIN_BM2
+#define PIN_AM1 4 //left
+#define PIN_AM2 3
+#define PIN_BM1 6//right
+#define PIN_BM2 7
 //======== led pin
 //led for status
-#define PIN_LEDB
-#define PIN_LEDG
+#define PIN_LEDB 9
+#define PIN_LEDG 10
 //led for battery
-#define PIN_LEDBATT
+#define PIN_LEDBATT 11
 //========================================
 //adc ratios to get a Volt value
 static float ratioBit = 1023 / 5;
 static float ratio = 10 / 25;
 //======================================== global variables
-unsigned long t0 = millis(), t1batt, t1line; //time variable to do timed stuff
-byte distance[4];							 // tab to store distance values from ultrasonic sensors
-byte line[4];								 //tab to store adc values from contrast sensors
+unsigned long t0 = millis(), t1batt, t1line,t1; //time variable to do timed stuff
+uint8_t distance[4];							 // tab to store distance values from ultrasonic sensors
+uint8_t line[4];								 //tab to store adc values from contrast sensors
 bool lineCrossed = false;					 //warning used by line sensor, puts robot in escape mode
 bool low = false;							 //warning for low battery voltage used to calculate time between low spike
 //===========
@@ -97,16 +99,16 @@ void loop()
 //puts distance from ultrasonic sensor in distance[]
 void getDistance()
 {
-	for (byte i = 0; i < 4; i++)
+	for (uint8_t i = 0; i < 4; i++)
 	{
-		digitalWrite(trigpin[i], LOW);
+		digitalWrite(pintrig[i], LOW);
 		delayMicroseconds(2);
 		// Sets the trigPin on HIGH state for 10 micro seconds
-		digitalWrite(trigpin[i], HIGH);
+		digitalWrite(pintrig[i], HIGH);
 		delayMicroseconds(10);
-		digitalWrite(trigpin[i], LOW);
+		digitalWrite(pintrig[i], LOW);
 		// Reads the echoPin, returns the sound wave travel time in microseconds
-		duration = pulseIn(echopin[i], HIGH);
+		float duration = pulseIn(pinecho[i], HIGH);
 		// Calculating the distance
 		distance[i] = duration * 0.0343 / 2;
 	}
@@ -115,14 +117,14 @@ void getDistance()
 //puts contrast values from adc in ligne[]
 void getLine()
 {
-	for (byte i = 0; i < 4; i++)
+	for (uint8_t i = 0; i < 4; i++)
 	{
 		static int dummy = analogRead(pinligne[i]);
 		line[i] = analogRead(pinligne[i]);
 	}
 }
 //get info from IR to update state
-byte getIR()
+uint8_t getIR()
 {
 	if (digitalRead(PIN_IR) == HIGH)
 		return START;
@@ -141,7 +143,7 @@ int getBatteryVoltage()
 
 //convert adc value in Volt and activate ledBatt
 //can stop the robot if battery is too low
-byte testBatt()
+uint8_t testBatt()
 {
 	float val = getBatteryVoltage(); //get raw value
 	val = val / ratioBit;			 //do calc to get Volt
@@ -149,7 +151,8 @@ byte testBatt()
 	if (val < 6.7) //if low start timing
 	{
 		t1batt = millis();
-		low = true ledBatt_Action(255);
+		low = true;
+     ledBatt_Action(255);
 		if (!low)
 		{
 			t0 = millis();
@@ -172,53 +175,54 @@ int verifyInfo()
 
 //compare threshold and adc value from contrast sensor
 //can put the robot in escape
-byte gestionLine()
+uint8_t gestionLine()
 {
+  getLine();
 	if (line[0] > limiteLine) //back left
 	{
-		lineCrossed = true
+		lineCrossed = true;
 			/////////moteur vers avant droite
 			motor_left(1, 0);
 		motor_right(0, 0);
 	}
 	if (line[1] > limiteLine) //front left
 	{
-		lineCrossed = true
+		lineCrossed = true;
 			/////////moteur vers arriere droite
 			motor_left(0, 1);
 		motor_right(0, 0);
 	}
 	if (line[2] > limiteLine) //front right
 	{
-		lineCrossed = true
+		lineCrossed = true;
 			/////////moteur vers arriere gauche
 			motor_left(0, 0);
 		motor_right(0, 1);
 	}
 	if (line[3] > limiteLine) //back right
 	{
-		lineCrossed = true
+		lineCrossed = true;
 			/////////moteur vers avant gauche
 			motor_left(0, 0);
 		motor_right(1, 0);
 	}
 	if (lineCrossed)
-		return -1 else return 0;
+		return -1; else return 0;
 }
 
 //use value from distance[] to know where the enemy robot is
-byte gestionPosAdv()
+uint8_t gestionPosAdv()
 {
-
+  getDistance();
 	if (verifyInfo() == -1) //verify info from ultrasonic sensor
 	{
-
-		for (byte i = 0; i < 5; i++)
+    uint8_t i;
+		for ( i = 0; i < 5; i++)
 		{
 			if (i < 4)
 			{
 				if (distance[i] < 80)
-					return
+					return;
 			}
 		}
 		if (i == 0)
@@ -241,7 +245,7 @@ byte gestionPosAdv()
 				return front_right;
 		}
 		if (i == 5)
-			return back
+			return back;
 	}
 }
 
@@ -249,7 +253,7 @@ byte gestionPosAdv()
 void attack()
 {
 	ledEtat.green = 255;
-	static byte last
+	static uint8_t last;
 	switch (adv_is)
 	{
 	case left:
@@ -298,7 +302,7 @@ void attack()
 	*/
 
 //wite pwm ratio on the battery led
-void ledBatt_Action(byte ratio)
+void ledBatt_Action(uint8_t ratio)
 {
 	analogWrite(PIN_LEDBATT, ratio);
 }
@@ -311,7 +315,7 @@ void ledEtat_Action()
 }
 
 //write values to H bridge for left motor
-void motor_left(byte in1, byte in2)
+void motor_left(uint8_t in1, uint8_t in2)
 {
 	if (in1 == 1)
 		digitalWrite(PIN_AM1, HIGH);
@@ -324,7 +328,7 @@ void motor_left(byte in1, byte in2)
 }
 
 //write values to H bridge for right motor
-void motor_right(byte in1, byte in2)
+void motor_right(uint8_t in1, uint8_t in2)
 {
 	if (in1 == 1)
 		digitalWrite(PIN_BM1, HIGH);
