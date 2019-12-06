@@ -6,10 +6,6 @@
         {
             "name": "Win32",
             "includePath": [
-                "C:\\Program Files (x86)\\Arduino\\tools\\**",
-                "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\**",
-                "C:\\Users\\titou\\AppData\\Local\\Arduino15\\packages\\esp8266\\tools\\**",
-                "C:\\Users\\titou\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\2.6.2\\**",
                 "c:/Users/titou/Documents/GitHub/Lil-Bot/include",
                 "c:/Users/titou/Documents/GitHub/Lil-Bot/src",
                 "C:/Users/titou/.platformio/packages/framework-arduino-avr/cores/arduino",
@@ -50,10 +46,7 @@
             "intelliSenseMode": "clang-x64",
             "cStandard": "c11",
             "cppStandard": "c++11",
-            "compilerPath": "\"C:/Users/titou/.platformio/packages/toolchain-atmelavr/bin/avr-gcc.exe\" -mmcu=atmega328p",
-            "forcedInclude": [
-                "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\cores\\arduino\\Arduino.h"
-            ]
+            "compilerPath": "\"C:/Users/titou/.platformio/packages/toolchain-atmelavr/bin/avr-gcc.exe\" -mmcu=atmega328p"
         }
     ],
     "version": 4

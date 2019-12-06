@@ -54,7 +54,7 @@ uint8_t line[4];								 //tab to store adc values from contrast sensors
 bool lineCrossed = false;					 //warning used by line sensor, puts robot in escape mode
 bool low = false;							 //warning for low battery voltage used to calculate time between low spike
 //===========
-#define limiteLine 500 //treshold for a line to be detected
+#define limiteLine 800 //treshold for a line to be detected
 //////////////////////////////////////////////////////////////////////////////////////////
 void setup() //nothing to do for now in setup
 {
@@ -178,28 +178,28 @@ int verifyInfo()
 uint8_t gestionLine()
 {
   getLine();
-	if (line[0] > limiteLine) //back left
+	if (line[0] < limiteLine) //back left
 	{
 		lineCrossed = true;
 			/////////moteur vers avant droite
 			motor_left(1, 0);
 		motor_right(0, 0);
 	}
-	if (line[1] > limiteLine) //front left
+	if (line[1] < limiteLine) //front left
 	{
 		lineCrossed = true;
 			/////////moteur vers arriere droite
 			motor_left(0, 1);
 		motor_right(0, 0);
 	}
-	if (line[2] > limiteLine) //front right
+	if (line[2] < limiteLine) //front right
 	{
 		lineCrossed = true;
 			/////////moteur vers arriere gauche
 			motor_left(0, 0);
 		motor_right(0, 1);
 	}
-	if (line[3] > limiteLine) //back right
+	if (line[3] < limiteLine) //back right
 	{
 		lineCrossed = true;
 			/////////moteur vers avant gauche
