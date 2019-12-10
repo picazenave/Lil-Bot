@@ -1,4 +1,4 @@
-#include <Arduino.h> 
+#include <Arduino.h>
 #include "function.h"
 //========led struc to get cleaner code
 struct led
@@ -31,12 +31,12 @@ statee state;
 //========================================
 static uint8_t pintrig[4] = {0, A5, 12, 8}, pinecho[4] = {1, 2, 13, 5}, pinligne[4] = {A1, A7, A2, A0};
 //                           0                             1
-#define PIN_IR A3  //pin for ir sensor
-#define PIN_BATT A6//pin for battery readings
+#define PIN_IR A3   //pin for ir sensor
+#define PIN_BATT A6 //pin for battery readings
 //======= motors pin
 #define PIN_BM1 4 //left
 #define PIN_BM2 3
-#define PIN_AM1 6//right
+#define PIN_AM1 6 //right
 #define PIN_AM2 7
 //======== led pin
 //led for status
@@ -49,11 +49,11 @@ static uint8_t pintrig[4] = {0, A5, 12, 8}, pinecho[4] = {1, 2, 13, 5}, pinligne
 static float ratioBit = 1023 / 5;
 static float ratio = 10 / 25;
 //======================================== global variables
-unsigned long t0 = millis(), t1batt, t1line,t1; //time variable to do timed stuff
+unsigned long t0 = millis(), t1batt, t1line, t1; //time variable to do timed stuff
 uint8_t distance[4];							 // tab to store distance values from ultrasonic sensors
 uint8_t line[4];								 //tab to store adc values from contrast sensors
-bool lineCrossed = false;					 //warning used by line sensor, puts robot in escape mode
-bool low = false;							 //warning for low battery voltage used to calculate time between low spike
+bool lineCrossed = false;						 //warning used by line sensor, puts robot in escape mode
+bool low = false;								 //warning for low battery voltage used to calculate time between low spike
 //===========
 #define limiteLine 800 //treshold for a line to be detected
 #define distance_trig 20
@@ -61,43 +61,26 @@ bool low = false;							 //warning for low battery voltage used to calculate tim
 void setup() //nothing to do for now in setup
 {
 	//Serial.begin(9600);
-	 for(int i=0;i<4;i++)
-  {
-    pinMode(pintrig[i],OUTPUT);
-    pinMode(pinecho[i],INPUT);
-	pinMode(pinligne[i],INPUT);
-  }
+	for (int i = 0; i < 4; i++)
+	{
+		pinMode(pintrig[i], OUTPUT);
+		pinMode(pinecho[i], INPUT);
+		pinMode(pinligne[i], INPUT);
+	}
 }
 
 void loop()
 {
-	
-	t1 = millis();
-	//wait for a command from IR
-	//state = getIR();
-		state=START;
-	// if (state == START)
-	// {
-	// 	state = testBatt();
-	// }
 	ledEtat.blue = 0;
 	ledEtat.green = 0;
-	if (state == START) //if battery and info are good then go
+	if (getIR == START) //if battery and info are good then go
 	{
-		//little brain
-		/*gewstion line*/
-		// if (gestionLine() == -1)
-		// {
-		// 	while (t1line - t0 < 600) //wait to escape a line
-		// 	{
-		// 		ledEtat.blue = 255; //signal that we are escaping
-		// 		t1line=millis();
-		// 	}
-		// 	ledEtat.blue = 0;
-		// 	lineCrossed = false; //reset the warning from contrast sensor
-		// }
-		/*search ennemy*/
-		adv_is =gestionPosAdv();
+		if (testBatt == START)
+			//little brain
+			/*gewstion line*/
+			gestionLine()
+				/*search ennemy*/
+				gestionPosAdv();
 		// use adv_is to know where to go
 		attack(); // activate motors in the right direction
 	}
@@ -134,7 +117,7 @@ void getLine()
 	{
 		static int dummy = analogRead(pinligne[i]);
 		line[i] = analogRead(pinligne[i]);
-	//if(t1%10==1)
+		//if(t1%10==1)
 		//Serial.println((String)"line"+i+":"+line[i]);
 	}
 }
@@ -165,124 +148,96 @@ uint8_t testBatt()
 	val = val / ratio;
 	if (val < 6.7) //if low start timing
 	{
-		t1batt = millis();
-		low = true;
-     ledBatt_Action(255);
-		if (!low)
-		{
-			t0 = millis();
-			ledBatt_Action(0);
-		}
-		if (low == true && t1batt - t0 > 100) //if low for too long STOP robot
-			return STOP;					  //if low for too long then stop the robot
+		ledBatt_Action(255);
+		return STOP; //if low for too long then stop the robot
 	}
 	if (val < 7) //led is mid brightness to say im low
 		ledBatt_Action(100);
 	return START; //everything is good
 }
 
-//check that value from right and left sensor are not wrong
-int verifyInfo()
-{
-	if (distance[0] < 50 && distance[3] < 50) //verify that both captor are not activated at the same time
-		return -1;
-	else
-	{
-		return 1;
-	}
-	
-}
-
 //compare threshold and adc value from contrast sensor
 //can put the robot in escape
-uint8_t gestionLine()
+void gestionLine()
 {
 
-  getLine();
+	getLine();
 	if (line[0] < limiteLine) //back left
 	{
 		lineCrossed = true;
-			/////////moteur vers avant droite
-			motor_left(1, 0);
+		/////////moteur vers avant droite
+		motor_left(1, 0);
 		motor_right(0, 0);
 	}
 	if (line[1] < limiteLine) //front left
 	{
 		lineCrossed = true;
-			/////////moteur vers arriere droite
-			motor_left(0, 1);
+		/////////moteur vers arriere droite
+		motor_left(0, 1);
 		motor_right(0, 0);
 	}
 	if (line[2] < limiteLine) //front right
 	{
 		lineCrossed = true;
-			/////////moteur vers arriere gauche
-			motor_left(0, 0);
+		/////////moteur vers arriere gauche
+		motor_left(0, 0);
 		motor_right(0, 1);
 	}
 	if (line[3] < limiteLine) //back right
 	{
 		lineCrossed = true;
-			/////////moteur vers avant gauche
-			motor_left(0, 0);
+		/////////moteur vers avant gauche
+		motor_left(0, 0);
 		motor_right(1, 0);
 	}
 	if (lineCrossed)
-		return -1; else return 0;
+		delay(300);
 }
 
 //use value from distance[] to know where the enemy robot is
 uint8_t gestionPosAdv()
 {
-  getDistance();
-	if (verifyInfo() == 1) //verify info from ultrasonic sensor
-	{
-    uint8_t i,j=0;
-	
-		for ( i = 0; i <4; i++)
-		{
-		if (distance[i]<distance[j])
-			j=i;
-					
-		}
-		if(distance[j]>distance_trig)
-		{
-		j=4;
-		}
-
-		//Serial.println(j);
-		if (j == 0)
-			return left;
-		if (j == 3)
-			return right;
-		if (j == 1)
-		{
-			if (distance[2] < distance_trig)
-				return  front;
-			else
-				 return front_left ;
-		}
-
-		if (j == 2)
-		{
-			if (distance[3] < distance_trig)
-				return front;
-			else
-				return  front_right;
-		}
-		if (j == 4)
-			return  back;
-	}
-}
-
-//use gestionPosAdv to move in the enemy direction
-void attack()
-{
 	ledEtat.green = 255;
 	static uint8_t last;
-	switch (adv_is)
+	getDistance();
+	uint8_t i, j = 0;
+
+	for (i = 0; i < 4; i++)
 	{
-	case left:
+		if (distance[i] < distance[j])
+			j = i;
+	}
+	if (distance[j] > distance_trig)
+	{
+		j = 4;
+	}
+
+	//Serial.println(j);
+	if (j == 0)
+		return left;
+	if (j == 3)
+		return right;
+	if (j == 1)
+	{
+		if (distance[2] > distance_trig)
+			return front;
+		else
+			return front_left;
+	}
+
+	if (j == 2)
+	{
+		if (distance[3] > distance_trig)
+			return front;
+		else
+			return front_right;
+	}
+	if (j == 4)
+		return back;
+
+	switch (j)
+	{
+	case 0: //left
 		motor_left(1, 1);
 		motor_right(1, 0);
 		break;
@@ -299,18 +254,18 @@ void attack()
 		motor_left(1, 0);
 		motor_right(0, 0);
 		break;
-	case right:
+	case 3: //right
 		motor_left(1, 0);
 		motor_right(1, 1);
 		break;
 
-	case back: //little trick to know wich path is faster to get adv in line of sight
-		if (last == right)
+	case 4:			   //little trick to know wich path is faster to get adv in line of sight
+		if (last == 3) //right
 		{
 			motor_left(1, 0);
 			motor_right(0, 1);
 		}
-		if (last == left)
+		if (last == 0) //left
 		{
 			motor_left(0, 1);
 			motor_right(1, 0);
@@ -318,10 +273,13 @@ void attack()
 		break;
 
 	default:
-		break;
+		motor_left(1, 1);
+		motor_right(1, 1);
 	}
-	if (last != back)
-		last = adv_is;
+	break;
+}
+if (last != back)
+	last = adv_is;
 }
 /*
 	action
@@ -330,14 +288,14 @@ void attack()
 //wite pwm ratio on the battery led
 void ledBatt_Action(uint8_t ratio)
 {
-	analogWrite(PIN_LEDBATT, 255-ratio);
+	analogWrite(PIN_LEDBATT, 255 - ratio);
 }
 
 //wite pwm ratio on the statut rgb led
 void ledEtat_Action()
 {
-	analogWrite(PIN_LEDG, 255-ledEtat.green);
-	analogWrite(PIN_LEDB, 255-ledEtat.blue);
+	analogWrite(PIN_LEDG, 255 - ledEtat.green);
+	analogWrite(PIN_LEDB, 255 - ledEtat.blue);
 }
 
 //write values to H bridge for left motor
