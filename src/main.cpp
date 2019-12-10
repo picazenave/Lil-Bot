@@ -117,7 +117,6 @@ void getLine()
 	{
 		static int dummy = analogRead(pinligne[i]);
 		line[i] = analogRead(pinligne[i]);
-		//if(t1%10==1)
 		//Serial.println((String)"line"+i+":"+line[i]);
 	}
 }
