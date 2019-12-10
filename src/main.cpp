@@ -80,7 +80,7 @@ void loop()
 			/*gewstion line*/
 			gestionLine()
 				/*search ennemy*/
-				gestionPosAdv();
+				adv_is = gestionPosAdv();
 		// use adv_is to know where to go
 		attack(); // activate motors in the right direction
 	}
@@ -197,8 +197,6 @@ void gestionLine()
 //use value from distance[] to know where the enemy robot is
 uint8_t gestionPosAdv()
 {
-	ledEtat.green = 255;
-	static uint8_t last;
 	getDistance();
 	uint8_t i, j = 0;
 
@@ -219,7 +217,7 @@ uint8_t gestionPosAdv()
 		return right;
 	if (j == 1)
 	{
-		if (distance[2] > distance_trig)
+		if (distance[2] < distance_trig)
 			return front;
 		else
 			return front_left;
@@ -227,17 +225,23 @@ uint8_t gestionPosAdv()
 
 	if (j == 2)
 	{
-		if (distance[3] > distance_trig)
+		if (distance[3] < distance_trig)
 			return front;
 		else
 			return front_right;
 	}
 	if (j == 4)
 		return back;
+}
 
-	switch (j)
+//use gestionPosAdv to move in the enemy direction
+void attack()
+{
+	ledEtat.green = 255;
+	static uint8_t last;
+	switch (adv_is)
 	{
-	case 0: //left
+	case left:
 		motor_left(1, 1);
 		motor_right(1, 0);
 		break;
@@ -254,18 +258,18 @@ uint8_t gestionPosAdv()
 		motor_left(1, 0);
 		motor_right(0, 0);
 		break;
-	case 3: //right
+	case right:
 		motor_left(1, 0);
 		motor_right(1, 1);
 		break;
 
-	case 4:			   //little trick to know wich path is faster to get adv in line of sight
-		if (last == 3) //right
+	case back: //little trick to know wich path is faster to get adv in line of sight
+		if (last == right)
 		{
 			motor_left(1, 0);
 			motor_right(0, 1);
 		}
-		if (last == 0) //left
+		if (last == left)
 		{
 			motor_left(0, 1);
 			motor_right(1, 0);
@@ -273,13 +277,10 @@ uint8_t gestionPosAdv()
 		break;
 
 	default:
-		motor_left(1, 1);
-		motor_right(1, 1);
+		break;
 	}
-	break;
-}
-if (last != back)
-	last = adv_is;
+	if (last != back)
+		last = adv_is;
 }
 /*
 	action
