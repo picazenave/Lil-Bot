@@ -19,7 +19,7 @@ uint8_t testBatt();
 int verifyInfo();
 //compare threshold and adc value from contrast sensor
 //can put the robot in escape
-uint8_t gestionLine();
+void gestionLine();
 //use value from distance[] to know where the enemy robot is
 uint8_t gestionPosAdv();
 //use gestionPosAdv to move in the enemy direction

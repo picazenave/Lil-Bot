@@ -7,25 +7,19 @@ struct led
 	uint8_t blue;
 };
 led ledEtat; //create a led object
-//========= enum all adv_is values
-enum adv_ise
-{
-	front,
-	front_left,
-	front_right,
-	right,
-	left,
-	back
-};
-adv_ise adv_is;
+//========= enum all adv_is values(changd to define bc broken on avr compiler)
+#define front 0
+#define front_left 1
+#define front_right 2
+#define right 3
+#define left 4
+#define back 5
+uint8_t adv_is;
 //======== enum all state values
-enum statee
-{
-	READY,
-	START,
-	STOP
-};
-statee state;
+#define READY 0
+#define START 1
+#define STOP 2
+uint8_t state;
 //define for all pins
 //pin de distance
 //========================================
@@ -55,7 +49,7 @@ uint8_t line[4];								 //tab to store adc values from contrast sensors
 bool lineCrossed = false;						 //warning used by line sensor, puts robot in escape mode
 bool low = false;								 //warning for low battery voltage used to calculate time between low spike
 //===========
-#define limiteLine 800 //treshold for a line to be detected
+#define limiteLine 100 //treshold for a line to be detected
 #define distance_trig 20
 //////////////////////////////////////////////////////////////////////////////////////////
 void setup() //nothing to do for now in setup
@@ -73,17 +67,19 @@ void loop()
 {
 	ledEtat.blue = 0;
 	ledEtat.green = 0;
-	if (getIR == START) //if battery and info are good then go
-	{
-		if (testBatt == START)
+	// if (getIR() == START) //if battery and info are good then go
+	// {
+		if (testBatt() == START)
+		{
 			//little brain
 			/*gewstion line*/
-			gestionLine()
-				/*search ennemy*/
-				adv_is = gestionPosAdv();
-		// use adv_is to know where to go
-		attack(); // activate motors in the right direction
-	}
+			gestionLine();
+			/*search ennemy*/
+			adv_is = gestionPosAdv();
+			// use adv_is to know where to go
+			attack(); // activate motors in the right direction
+		}
+	//}
 	ledEtat_Action(); //write pwm values on leds
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -159,15 +155,16 @@ uint8_t testBatt()
 //can put the robot in escape
 void gestionLine()
 {
-
 	getLine();
-	if (line[0] < limiteLine) //back left
-	{
-		lineCrossed = true;
-		/////////moteur vers avant droite
-		motor_left(1, 0);
-		motor_right(0, 0);
-	}
+	for (int i = 0; i < 4; i++)
+		//Serial.println((String)"line"+i+":"+line[i]);
+		if (line[0] < limiteLine) //back left
+		{
+			lineCrossed = true;
+			/////////moteur vers avant droite
+			motor_left(1, 0);
+			motor_right(0, 0);
+		}
 	if (line[1] < limiteLine) //front left
 	{
 		lineCrossed = true;
@@ -190,7 +187,13 @@ void gestionLine()
 		motor_right(1, 0);
 	}
 	if (lineCrossed)
-		delay(300);
+	{
+		delay(100);
+		motor_left(1, 0);
+		motor_right(1, 0)
+		delay(200);
+	}
+	
 }
 
 //use value from distance[] to know where the enemy robot is
