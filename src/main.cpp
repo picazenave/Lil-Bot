@@ -69,16 +69,16 @@ void loop()
 	ledEtat.green = 0;
 	// if (getIR() == START) //if battery and info are good then go
 	// {
-		if (testBatt() == START)
-		{
-			//little brain
-			/*gewstion line*/
-			gestionLine();
-			/*search ennemy*/
-			adv_is = gestionPosAdv();
-			// use adv_is to know where to go
-			attack(); // activate motors in the right direction
-		}
+	if (testBatt() == START)
+	{
+		//little brain
+		/*gewstion line*/
+		gestionLine();
+		/*search ennemy*/
+		adv_is = gestionPosAdv();
+		// use adv_is to know where to go
+		attack(); // activate motors in the right direction
+	}
 	//}
 	ledEtat_Action(); //write pwm values on leds
 }
@@ -156,44 +156,41 @@ uint8_t testBatt()
 void gestionLine()
 {
 	getLine();
-	for (int i = 0; i < 4; i++)
-		//Serial.println((String)"line"+i+":"+line[i]);
-		if (line[0] < limiteLine) //back left
-		{
-			lineCrossed = true;
-			/////////moteur vers avant droite
-			motor_left(1, 0);
-			motor_right(0, 0);
-		}
-	if (line[1] < limiteLine) //front left
+	//for (int i = 0; i < 4; i++)
+	//Serial.println((String)"line"+i+":"+line[i]);
+	if (line[0] < limiteLine) //back left
+	{
+		lineCrossed = true;
+		/////////moteur vers avant droite
+		motor_left(1, 0);
+		motor_right(0, 0);
+	} else if (line[1] < limiteLine) //front left
 	{
 		lineCrossed = true;
 		/////////moteur vers arriere droite
 		motor_left(0, 1);
 		motor_right(0, 0);
-	}
-	if (line[2] < limiteLine) //front right
+	} else if (line[2] < limiteLine) //front right
 	{
 		lineCrossed = true;
 		/////////moteur vers arriere gauche
 		motor_left(0, 0);
 		motor_right(0, 1);
-	}
-	if (line[3] < limiteLine) //back right
+	}else if (line[3] < limiteLine) //back right
 	{
 		lineCrossed = true;
 		/////////moteur vers avant gauche
 		motor_left(0, 0);
 		motor_right(1, 0);
-	}
+	} 
+	
 	if (lineCrossed)
 	{
 		delay(100);
 		motor_left(1, 0);
-		motor_right(1, 0)
-		delay(200);
+		motor_right(1, 0);
+			delay(200);
 	}
-	
 }
 
 //use value from distance[] to know where the enemy robot is
@@ -234,6 +231,7 @@ uint8_t gestionPosAdv()
 	}
 	if (j == 4)
 		return back;
+	return back;
 }
 
 //use gestionPosAdv to move in the enemy direction
