@@ -8,7 +8,7 @@ void getLine();
 //get info from IR to update state
 uint8_t getIR();
 //read battery voltage from adc
-int getBatteryVoltage();
+float getBatteryVoltage();
 /*
 	processing
 	*/

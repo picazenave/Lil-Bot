@@ -40,8 +40,7 @@ static uint8_t pintrig[4] = {0, A5, 12, 8}, pinecho[4] = {1, 2, 13, 5}, pinligne
 #define PIN_LEDBATT 11
 //========================================
 //adc ratios to get a Volt value
-static float ratioBit = 1023 / 5;
-static float ratio = 10 / 25;
+static float ratio = 25 / 10;
 //======================================== global variables
 unsigned long t0 = millis(), t1batt, t1line, t1; //time variable to do timed stuff
 uint8_t distance[4];							 // tab to store distance values from ultrasonic sensors
@@ -54,7 +53,8 @@ bool low = false;								 //warning for low battery voltage used to calculate ti
 //////////////////////////////////////////////////////////////////////////////////////////
 void setup() //nothing to do for now in setup
 {
-	//Serial.begin(9600);
+	Serial.begin(9600);
+	pinMode(PIN_IR,INPUT_PULLUP);
 	for (int i = 0; i < 4; i++)
 	{
 		pinMode(pintrig[i], OUTPUT);
@@ -125,9 +125,11 @@ uint8_t getIR()
 		return STOP;
 }
 //read battery voltage from adc
-int getBatteryVoltage()
+float getBatteryVoltage()
 {
-	return analogRead(PIN_BATT); //return a raw value
+	int dummy=analogRead(PIN_BATT);
+	float val=analogRead(PIN_BATT);
+	return  val;//return a raw value
 }
 
 /*
@@ -138,12 +140,15 @@ int getBatteryVoltage()
 //can stop the robot if battery is too low
 uint8_t testBatt()
 {
-	float val = getBatteryVoltage(); //get raw value
-	val = val / ratioBit;			 //do calc to get Volt
-	val = val / ratio;
+	float val=map(getBatteryVoltage(),0,1023,0,5);
+	val = val / 0.4;
+	Serial.println(val);
+	
 	if (val < 6.7) //if low start timing
 	{
 		ledBatt_Action(255);
+		motor_left(0,0);
+		motor_right(0,0);
 		return STOP; //if low for too long then stop the robot
 	}
 	if (val < 7) //led is mid brightness to say im low
