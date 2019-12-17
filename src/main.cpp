@@ -23,7 +23,7 @@ uint8_t state;
 //define for all pins
 //pin de distance
 //========================================
-static uint8_t pintrig[4] = {0, A5, 12, 8}, pinecho[4] = {1, 2, 13, 5}, pinligne[4] = {A1, A7, A2, A0};
+static uint8_t pintrig[4] = {0, A5, 12, 8}, pinecho[4] = {1, 2, 13, 5}, pinligne[4] = {A0, A2, A7, A1};
 //                           0                             1
 #define PIN_IR A3   //pin for ir sensor
 #define PIN_BATT A6 //pin for battery readings
@@ -48,27 +48,32 @@ uint8_t line[4];								 //tab to store adc values from contrast sensors
 bool lineCrossed = false;						 //warning used by line sensor, puts robot in escape mode
 bool low = false;								 //warning for low battery voltage used to calculate time between low spike
 //===========
-#define limiteLine 100 //treshold for a line to be detected
-#define distance_trig 20
+#define limiteLine 80 //treshold for a line to be detected
+#define distance_trig 40
 //////////////////////////////////////////////////////////////////////////////////////////
 void setup() //nothing to do for now in setup
 {
-	Serial.begin(9600);
-	pinMode(PIN_IR,INPUT_PULLUP);
+	//Serial.begin(9600);
+	pinMode(PIN_IR,INPUT);
 	for (int i = 0; i < 4; i++)
 	{
 		pinMode(pintrig[i], OUTPUT);
 		pinMode(pinecho[i], INPUT);
 		pinMode(pinligne[i], INPUT);
 	}
+	while (getIR()==STOP)
+	{}
+	delay(5000);
 }
 
 void loop()
 {
+	
 	ledEtat.blue = 0;
 	ledEtat.green = 0;
-	// if (getIR() == START) //if battery and info are good then go
-	// {
+	if (getIR() == START) //if battery and info are good then go
+	{
+	
 	if (testBatt() == START)
 	{
 		//little brain
@@ -79,7 +84,13 @@ void loop()
 		// use adv_is to know where to go
 		attack(); // activate motors in the right direction
 	}
-	//}
+	}
+	else
+	{
+		motor_left(1,1);
+	motor_right(1,1);
+	}
+	
 	ledEtat_Action(); //write pwm values on leds
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -125,10 +136,10 @@ uint8_t getIR()
 		return STOP;
 }
 //read battery voltage from adc
-float getBatteryVoltage()
+int getBatteryVoltage()
 {
 	int dummy=analogRead(PIN_BATT);
-	float val=analogRead(PIN_BATT);
+	int val=analogRead(PIN_BATT)*10;
 	return  val;//return a raw value
 }
 
@@ -140,9 +151,9 @@ float getBatteryVoltage()
 //can stop the robot if battery is too low
 uint8_t testBatt()
 {
-	float val=map(getBatteryVoltage(),0,1023,0,5);
-	val = val / 0.4;
-	Serial.println(val);
+	float val=map(getBatteryVoltage(),0,10230.0,0,50);
+	val = val / 4;
+	//Serial.println(val);
 	
 	if (val < 6.7) //if low start timing
 	{
@@ -153,6 +164,11 @@ uint8_t testBatt()
 	}
 	if (val < 7) //led is mid brightness to say im low
 		ledBatt_Action(100);
+	else
+	{
+		ledBatt_Action(0);
+	}
+	
 	return START; //everything is good
 }
 
@@ -163,38 +179,43 @@ void gestionLine()
 	getLine();
 	//for (int i = 0; i < 4; i++)
 	//Serial.println((String)"line"+i+":"+line[i]);
+	lineCrossed=false;
 	if (line[0] < limiteLine) //back left
 	{
 		lineCrossed = true;
 		/////////moteur vers avant droite
+		
 		motor_left(1, 0);
-		motor_right(0, 0);
+		motor_right(1, 1);
 	} else if (line[1] < limiteLine) //front left
 	{
 		lineCrossed = true;
 		/////////moteur vers arriere droite
-		motor_left(0, 1);
-		motor_right(0, 0);
+		motor_left(1, 1);
+		motor_right(0,1);
 	} else if (line[2] < limiteLine) //front right
 	{
 		lineCrossed = true;
 		/////////moteur vers arriere gauche
-		motor_left(0, 0);
-		motor_right(0, 1);
+		motor_left(0, 1);
+		motor_right(1, 1);
 	}else if (line[3] < limiteLine) //back right
 	{
 		lineCrossed = true;
 		/////////moteur vers avant gauche
-		motor_left(0, 0);
+		motor_left(1, 1);
 		motor_right(1, 0);
 	} 
 	
 	if (lineCrossed)
 	{
-		delay(100);
+		ledEtat.blue=255;
+		ledEtat_Action();
+		delay(400);
 		motor_left(1, 0);
 		motor_right(1, 0);
-			delay(200);
+			delay(100);
+		ledEtat.blue=0;
 	}
 }
 

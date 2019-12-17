@@ -6,31 +6,31 @@
         {
             "name": "Win32",
             "includePath": [
-                "c:/Users/titou/Documents/GitHub/Lil-Bot/include",
-                "c:/Users/titou/Documents/GitHub/Lil-Bot/src",
-                "C:/Users/titou/.platformio/packages/framework-arduino-avr/cores/arduino",
-                "C:/Users/titou/.platformio/packages/framework-arduino-avr/variants/standard",
-                "C:/Users/titou/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
-                "C:/Users/titou/.platformio/packages/framework-arduino-avr/libraries/HID/src",
-                "C:/Users/titou/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
-                "C:/Users/titou/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
-                "C:/Users/titou/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
-                "C:/Users/titou/.platformio/packages/tool-unity",
+                "c:/Users/Utilisateur/Documents/GitHub/Lil-Bot/include",
+                "c:/Users/Utilisateur/Documents/GitHub/Lil-Bot/src",
+                "C:/Users/Utilisateur/.platformio/packages/framework-arduino-avr/cores/arduino",
+                "C:/Users/Utilisateur/.platformio/packages/framework-arduino-avr/variants/standard",
+                "C:/Users/Utilisateur/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                "C:/Users/Utilisateur/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                "C:/Users/Utilisateur/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                "C:/Users/Utilisateur/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                "C:/Users/Utilisateur/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                "C:/Users/Utilisateur/.platformio/packages/tool-unity",
                 ""
             ],
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
                 "path": [
-                    "c:/Users/titou/Documents/GitHub/Lil-Bot/include",
-                    "c:/Users/titou/Documents/GitHub/Lil-Bot/src",
-                    "C:/Users/titou/.platformio/packages/framework-arduino-avr/cores/arduino",
-                    "C:/Users/titou/.platformio/packages/framework-arduino-avr/variants/standard",
-                    "C:/Users/titou/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
-                    "C:/Users/titou/.platformio/packages/framework-arduino-avr/libraries/HID/src",
-                    "C:/Users/titou/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
-                    "C:/Users/titou/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
-                    "C:/Users/titou/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
-                    "C:/Users/titou/.platformio/packages/tool-unity",
+                    "c:/Users/Utilisateur/Documents/GitHub/Lil-Bot/include",
+                    "c:/Users/Utilisateur/Documents/GitHub/Lil-Bot/src",
+                    "C:/Users/Utilisateur/.platformio/packages/framework-arduino-avr/cores/arduino",
+                    "C:/Users/Utilisateur/.platformio/packages/framework-arduino-avr/variants/standard",
+                    "C:/Users/Utilisateur/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                    "C:/Users/Utilisateur/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                    "C:/Users/Utilisateur/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                    "C:/Users/Utilisateur/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                    "C:/Users/Utilisateur/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                    "C:/Users/Utilisateur/.platformio/packages/tool-unity",
                     ""
                 ]
             },
@@ -46,7 +46,7 @@
             "intelliSenseMode": "clang-x64",
             "cStandard": "c11",
             "cppStandard": "c++11",
-            "compilerPath": "\"C:/Users/titou/.platformio/packages/toolchain-atmelavr/bin/avr-gcc.exe\" -mmcu=atmega328p"
+            "compilerPath": "\"C:/Users/Utilisateur/.platformio/packages/toolchain-atmelavr/bin/avr-gcc.exe\" -mmcu=atmega328p"
         }
     ],
     "version": 4
